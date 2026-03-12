@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Procurações | CTA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="logo_CTA.ico">
+    
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; color: #1a202c; min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar-custom { background: white; border-bottom: 3px solid #107c41; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .stat-card { border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s; background: white; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .main-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; }
+        .table thead th { background: #f8fafc; color: #64748b; font-size: 0.72rem; text-transform: uppercase; cursor: pointer; white-space: nowrap; border-bottom: 2px solid #e2e8f0; }
+        .badge-status { padding: 0.5em 1em; border-radius: 6px; font-weight: 600; font-size: 0.7rem; display: inline-block; width: 130px; text-align: center; }
+        
+        /* Cores de Status */
+        .status-ativa { background: #dcfce7; color: #166534; }
+        .status-vence-hoje { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .status-vencimento-próximo { background: #0ea5e9; color: white; }
+        .status-expirada { background: #fee2e2; color: #991b1b; }
+        .status-cancelada { background: #f1f5f9; color: #475569; }
+        
+        .dropdown-menu { font-size: 0.85rem; min-width: 200px; }
+        .form-check-input:checked { background-color: #107c41; border-color: #107c41; }
+
+        footer { background: white; padding: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+<div class="container-fluid px-0">
+    <div class="banner-wrapper">
+        <img src="banner_CTA.png" alt="Banner CTA" class="img-fluid w-100 shadow-sm" style="max-height: 200px; object-fit: cover;">
+    </div>
+</div>
+<nav class="navbar navbar-custom py-3">
+    <div class="container-fluid px-4">
+        <div>
+            <span class="navbar-brand mb-0 h1 fw-bold text-success">GESTOR DE PROCURAÇÕES - CTA</span>
+            <div class="text-muted small">Sistema de Monitoramento Interno</div>
+        </div>
+        <div class="d-flex gap-2">
+            <input type="file" id="fileInput" hidden onchange="processarExcel(this)">
+            <button class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('fileInput').click()"> Importar Planilha</button>
+            <button class="btn btn-primary btn-sm" onclick="abrirModal()">+ Novo Registro</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 mt-4">
+    <div class="row mb-4 g-3">
+        <div class="col-md" onclick="filtrarPorCard('')"><div class="card stat-card p-3 border-start border-4 border-dark"><small class="text-muted fw-bold">TOTAL</small><div class="h4 fw-bold mb-0" id="val-total">0</div></div></div>
+        <div class="col-md" onclick="filtrarPorCard('Ativa')"><div class="card stat-card p-3 border-start border-4 border-success"><small class="text-success fw-bold">ATIVAS</small><div class="h4 fw-bold mb-0" id="val-ativa">0</div></div></div>
+        <div class="col-md" onclick="filtrarPorCard('Vence Hoje')"><div class="card stat-card p-3 border-start border-4 border-warning"><small class="text-warning fw-bold">VENCE HOJE</small><div class="h4 fw-bold mb-0" id="val-hoje">0</div></div></div>
+        <div class="col-md" onclick="filtrarPorCard('Vencimento Próximo')"><div class="card stat-card p-3 border-start border-4 border-info" style="border-color: #0ea5e9 !important;"><small class="text-info fw-bold" style="color: #0ea5e9 !important;">PRÓX. 5 DIAS</small><div class="h4 fw-bold mb-0" id="val-prox">0</div></div></div>
+        <div class="col-md" onclick="filtrarPorCard('Expirada')"><div class="card stat-card p-3 border-start border-4 border-danger"><small class="text-danger fw-bold">EXPIRADAS</small><div class="h4 fw-bold mb-0" id="val-expirada">0</div></div></div>
+    </div>
+
+    <div class="main-container mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th onclick="ordenar(0)">Certificado ↕</th>
+                        <th onclick="ordenar(1)">Empresa ↕</th>
+                        <th onclick="ordenar(2)">Cnpj ↕</th>
+                        <th onclick="ordenar(3)">Validade ↕</th>
+                        <th onclick="ordenar(4)">Situação ↕</th>
+                        <th onclick="ordenar(5)">Parceiro ↕</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                    <tr class="filter-row">
+                        <th>
+                            <select class="form-select form-select-sm" onchange="multiFiltro()">
+                                <option value="">Todos</option>
+                                <option value="SOCIEDADE">SOCIEDADE</option>
+                                <option value="PARTIDAS">PARTIDAS</option>
+                                <option value="ICONTAZ">ICONTAZ</option>
+                                <option value="G5">G5</option>
+                                <option value="ALLTUS ADM">ALLTUS ADM</option>
+                                <option value="ALENCAR ADM">ALENCAR ADM</option>
+                            </select>
+                        </th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder="Buscar Empresa..." onkeyup="multiFiltro()"></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder="Buscar CNPJ..." onkeyup="multiFiltro()"></th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder="Data..." onkeyup="multiFiltro()"></th>
+                        <th class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.75rem;">
+                                Filtrar Situação
+                            </button>
+                            <ul class="dropdown-menu p-3">
+                                <li><label class="form-check-label"><input type="checkbox" class="form-check-input check-status" value="Ativa" onchange="multiFiltro()"> Ativa</label></li>
+                                <li><label class="form-check-label"><input type="checkbox" class="form-check-input check-status" value="Vence Hoje" onchange="multiFiltro()"> Vence Hoje</label></li>
+                                <li><label class="form-check-label"><input type="checkbox" class="form-check-input check-status" value="Vencimento Próximo" onchange="multiFiltro()"> Próximo (5 dias)</label></li>
+                                <li><label class="form-check-label"><input type="checkbox" class="form-check-input check-status" value="Expirada" onchange="multiFiltro()"> Expirada</label></li>
+                                <li><label class="form-check-label"><input type="checkbox" class="form-check-input check-status" value="Cancelada" onchange="multiFiltro()"> Cancelada</label></li>
+                            </ul>
+                        </th>
+                        <th><input type="text" class="form-control form-control-sm" placeholder="Buscar Parceiro..." onkeyup="multiFiltro()"></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalForm" tabindex="-1">
+    <div class="modal-dialog modal-lg border-0">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">Registro de Procuração</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="procuracaoForm" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">CERTIFICADO</label>
+                        <select id="m-cert" class="form-select">
+                            <option>SOCIEDADE</option>
+                            <option>PARTIDAS</option>
+                            <option>ICONTAZ</option>
+                            <option>G5</option>
+                            <option>ALLTUS ADM</option>
+                            <option>ALENCAR ADM</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8"><label class="form-label small fw-bold">EMPRESA</label><input type="text" id="m-empresa" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">CNPJ</label><input type="text" id="m-cnpj" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">VALIDADE</label><input type="date" id="m-validade" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">SITUAÇÃO MANUAL</label><select id="m-sit-manual" class="form-select"><option value="Auto">Automático</option><option value="Cancelada">Cancelada</option></select></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">PARCEIRO</label><input type="text" id="m-parceiro" class="form-control"></div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" onclick="salvar()" class="btn btn-success px-5 fw-bold">SALVAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container-fluid px-4 d-flex justify-content-between">
+        <div class="fw-bold text-success">AzDev Coder &copy; 2026</div>
+        <div class="text-muted small">Hoje: <span id="data-footer"></span> | Última Sincronização: <span id="last-sync">-</span></div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="modal fade" id="modalForm" tabindex="-1">
+    <div class="modal-dialog modal-lg border-0">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">Registro de Autorização Intergaláctica</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="procuracaoForm" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">PROTOCOLO</label>
+                        <select id="m-cert" class="form-select">
+                            <option>ALIANÇA ESTELAR</option>
+                            <option>SETOR 9</option>
+                            <option>NEBULA-X</option>
+                            <option>ORBITAL 5</option>
+                            <option>QUANTUM ADM</option>
+                            <option>CYBERDYNE</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8"><label class="form-label small fw-bold">CORPORAÇÃO</label><input type="text" id="m-empresa" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">ID PLANETÁRIO</label><input type="text" id="m-cnpj" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">DATA ESTELAR</label><input type="date" id="m-validade" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">SITUAÇÃO DE VOO</label><select id="m-sit-manual" class="form-select"><option value="Auto">Piloto Automático</option><option value="Cancelada">Aterrissado</option></select></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">COMANDANTE</label><input type="text" id="m-parceiro" class="form-control"></div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" onclick="salvar()" class="btn btn-success px-5 fw-bold">LOGAR DADOS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container-fluid px-4 d-flex justify-content-between">
+        <div class="fw-bold text-success">AzDev Coder &copy; 2026</div>
+        <div class="text-muted small">Transmissão: <span id="data-footer"></span> | Última Sincronização: <span id="last-sync">-</span></div>
+    </div>
+</footer>
+
+<script>
+    let dados = [
+        { certificado: "ALIANÇA ESTELAR", empresa: "MINERAÇÃO DE ASTEROIDES ANDROMEDA", cnpj: "00.111.222/0001-99", validade: "2029-12-20", situacao: "Ativa", parceiro: "Capitão Nemo" },
+        { certificado: "SETOR 9", empresa: "LABORATÓRIOS BIOPUNK S.A.", cnpj: "99.888.777/0001-11", validade: "2030-01-31", situacao: "Vigente", parceiro: "Dra. Aris" },
+        { certificado: "NEBULA-X", empresa: "TRANSPORTES DE DOBRA ESPACIAL", cnpj: "55.444.333/0001-22", validade: "2028-03-03", situacao: "Expirada", parceiro: "-" },
+        { certificado: "ORBITAL 5", empresa: "AGRO-DOMOS DE MARTE LTDA", cnpj: "12.345.678/0001-00", validade: "2027-05-02", situacao: "Vigente", parceiro: "Sidinei" },
+        { certificado: "QUANTUM ADM", empresa: "COMPUTADORES POSITRÔNICOS", cnpj: "44.555.666/0001-44", validade: "2031-06-20", situacao: "Vigente", parceiro: "Zanelato" },
+        { certificado: "CYBERDYNE", empresa: "RESTAURANTE NO FIM DO UNIVERSO", cnpj: "42.424.242/0042-00", validade: "2026-07-05", situacao: "Cancelada", parceiro: "Ford Prefect" },
+        { certificado: "ALIANÇA ESTELAR", empresa: "HOTÉIS ORBITAIS SATURNO", cnpj: "11.222.333/0001-88", validade: "2025-07-15", situacao: "Expirada", parceiro: "-" },
+        { certificado: "SETOR 9", empresa: "OXIGÊNIO & CIA - LUNA", cnpj: "00.000.001/0001-01", validade: "2026-07-18", situacao: "Vigente", parceiro: "Tony Stark" },
+        { certificado: "NEBULA-X", empresa: "REPAROS DE ANDROIDES", cnpj: "88.777.666/0001-55", validade: "2027-07-18", situacao: "Vigente", parceiro: "Deckard" }
+    ];
+    let editIdx = -1;
+    let ordem = { col: null, dir: 'asc' };
+    
+    const HOJE = new Date(); 
+    HOJE.setHours(0,0,0,0);
+
+    window.onload = () => {
+        document.getElementById('data-footer').innerText = HOJE.toLocaleDateString('pt-BR');
+        renderizar();
+    };
+
+    function calcularSituacao(dataVal, sitManual) {
+        if (sitManual === "Cancelada") return "Cancelada";
+        if (!dataVal) return "-";
+        const partes = dataVal.split('-');
+        const dVal = new Date(partes[0], partes[1] - 1, partes[2]);
+        dVal.setHours(0,0,0,0);
+        const diffTime = dVal.getTime() - HOJE.getTime();
+        const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDias < 0) return "Expirada";
+        if (diffDias === 0) return "Vence Hoje";
+        if (diffDias <= 5) return "Vencimento Próximo";
+        return "Ativa";
+    }
+
+    function renderizar() {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        dados.forEach((d, i) => {
+            const sit = calcularSituacao(d.validade, d.situacao);
+            const badgeClass = sit.toLowerCase().replace(/ /g, '-');
+            tbody.innerHTML += `
+                <tr>
+                    <td><span class="badge bg-light text-dark border">${d.certificado}</span></td>
+                    <td class="fw-bold">${d.empresa}</td>
+                    <td>${d.cnpj}</td>
+                    <td>${d.validade.split('-').reverse().join('/')}</td>
+                    <td><span class="badge-status status-${badgeClass}">${sit}</span></td>
+                    <td>${d.parceiro}</td>
+                    <td class="text-center"><button class="btn btn-sm btn-outline-primary" onclick="abrirModal(${i})">Editar</button></td>
+                </tr>
+            `;
+        });
+        multiFiltro();
+        document.getElementById('last-sync').innerText = new Date().toLocaleTimeString();
+    }
+
+    function multiFiltro() {
+        const rows = document.querySelectorAll("#table-body tr");
+        const inputs = document.querySelectorAll(".filter-row input, .filter-row select:not(.check-status)");
+        const statusSelecionados = Array.from(document.querySelectorAll(".check-status:checked")).map(cb => cb.value.toLowerCase());
+
+        let stats = { total: 0, ativa: 0, hoje: 0, prox: 0, expirada: 0 };
+
+        rows.forEach(row => {
+            let match = true;
+
+            // Filtros de texto e select comum
+            inputs.forEach((input) => {
+                let colIndex = input.closest('th').cellIndex;
+                if (colIndex !== 4) { // Pula a coluna de situação que tratamos abaixo
+                    let val = input.value.toLowerCase();
+                    let cell = row.cells[colIndex].innerText.toLowerCase();
+                    if (val && !cell.includes(val)) match = false;
+                }
+            });
+
+            // Filtro de Múltiplas Situações (Checkbox)
+            if (statusSelecionados.length > 0) {
+                let cellStatus = row.cells[4].innerText.toLowerCase();
+                if (!statusSelecionados.includes(cellStatus)) match = false;
+            }
+
+            row.style.display = match ? "" : "none";
+
+            if (match) {
+                stats.total++;
+                const s = row.cells[4].innerText;
+                if (s === "Ativa") stats.ativa++;
+                else if (s === "Vence Hoje") stats.hoje++;
+                else if (s === "Vencimento Próximo") stats.prox++;
+                else if (s === "Expirada") stats.expirada++;
+            }
+        });
+
+        document.getElementById('val-total').innerText = stats.total;
+        document.getElementById('val-ativa').innerText = stats.ativa;
+        document.getElementById('val-hoje').innerText = stats.hoje;
+        document.getElementById('val-prox').innerText = stats.prox;
+        document.getElementById('val-expirada').innerText = stats.expirada;
+    }
+
+    function filtrarPorCard(status) {
+        document.querySelectorAll(".check-status").forEach(cb => cb.checked = false);
+        if (status) {
+            const cb = Array.from(document.querySelectorAll(".check-status")).find(c => c.value === status);
+            if (cb) cb.checked = true;
+        }
+        multiFiltro();
+    }
+
+    function processarExcel(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const novosDados = raw.map(row => ({
+                certificado: row.Certificado || row.CERTIFICADO || "SOCIEDADE",
+                empresa: row.Empresa || row.EMPRESA || "Não informado",
+                cnpj: row.Cnpj || row.CNPJ || "-",
+                validade: formatarDataExcel(row.Validade || row.VALIDADE),
+                situacao: row.Situacao || row.SITUAÇÃO || "Auto",
+                parceiro: row.Parceiro || row.PARCEIRO || "-"
+            }));
+            dados = [...dados, ...novosDados];
+            renderizar();
+        };
+        reader.readAsArrayBuffer(input.files[0]);
+    }
+
+    function formatarDataExcel(val) {
+        if (!val) return "";
+        if (typeof val === 'number') return new Date((val - 25569) * 86400 * 1000).toISOString().split('T')[0];
+        return val;
+    }
+
+    function ordenar(col) {
+        const chaves = ['certificado', 'empresa', 'cnpj', 'validade', 'situacao', 'parceiro'];
+        const chave = chaves[col];
+        ordem.dir = (ordem.col === col && ordem.dir === 'asc') ? 'desc' : 'asc';
+        ordem.col = col;
+        dados.sort((a, b) => {
+            let vA = (a[chave] || "").toString();
+            let vB = (b[chave] || "").toString();
+            return ordem.dir === 'asc' ? vA.localeCompare(vB) : vB.localeCompare(vA);
+        });
+        renderizar();
+    }
+
+    function abrirModal(idx = -1) {
+        editIdx = idx;
+        const modalEl = document.getElementById('modalForm');
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        if (idx > -1) {
+            const d = dados[idx];
+            document.getElementById('m-cert').value = d.certificado;
+            document.getElementById('m-empresa').value = d.empresa;
+            document.getElementById('m-cnpj').value = d.cnpj;
+            document.getElementById('m-validade').value = d.validade;
+            document.getElementById('m-sit-manual').value = d.situacao;
+            document.getElementById('m-parceiro').value = d.parceiro;
+        } else {
+            document.getElementById('procuracaoForm').reset();
+            document.getElementById('m-sit-manual').value = "Auto";
+        }
+        modalInstance.show();
+    }
+
+    function salvar() {
+        const d = {
+            certificado: document.getElementById('m-cert').value,
+            empresa: document.getElementById('m-empresa').value,
+            cnpj: document.getElementById('m-cnpj').value,
+            validade: document.getElementById('m-validade').value,
+            situacao: document.getElementById('m-sit-manual').value,
+            parceiro: document.getElementById('m-parceiro').value
+        };
+        if(!d.empresa || !d.validade) { alert("Preencha os campos obrigatórios!"); return; }
+        if (editIdx > -1) dados[editIdx] = d;
+        else dados.push(d);
+        bootstrap.Modal.getInstance(document.getElementById('modalForm')).hide();
+        renderizar();
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
