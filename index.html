@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Procurações | CTA</title>
+    <title>Dashboard Procurações | Empresa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link rel="icon" type="image/x-icon" href="logo_CTA.ico">
+    <link rel="icon" type="image/x-icon" href="logo_empresa.ico">
     
     <style>
         body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; color: #1a202c; min-height: 100vh; display: flex; flex-direction: column; }
@@ -40,7 +40,7 @@
 <nav class="navbar navbar-custom py-3">
     <div class="container-fluid px-4">
         <div>
-            <span class="navbar-brand mb-0 h1 fw-bold text-success">GESTOR DE PROCURAÇÕES - CTA</span>
+            <span class="navbar-brand mb-0 h1 fw-bold text-success">GESTOR DE PROCURAÇÕES - EMPRESA</span>
             <div class="text-muted small">Sistema de Monitoramento Interno</div>
         </div>
         <div class="d-flex gap-2">
@@ -76,13 +76,12 @@
                     <tr class="filter-row">
                         <th>
                             <select class="form-select form-select-sm" onchange="multiFiltro()">
-                                <option value="">Todos</option>
-                                <option value="SOCIEDADE">SOCIEDADE</option>
-                                <option value="PARTIDAS">PARTIDAS</option>
-                                <option value="ICONTAZ">ICONTAZ</option>
-                                <option value="G5">G5</option>
-                                <option value="ALLTUS ADM">ALLTUS ADM</option>
-                                <option value="ALENCAR ADM">ALENCAR ADM</option>
+                            <option>ALIANÇA</option>
+                            <option>SETOR 9</option>
+                            <option>NEBULA-X</option>
+                            <option>ORBITAL 5</option>
+                            <option>QUANTUM ADM</option>
+                            <option>CYBERDYNE</option>
                             </select>
                         </th>
                         <th><input type="text" class="form-control form-control-sm" placeholder="Buscar Empresa..." onkeyup="multiFiltro()"></th>
@@ -122,12 +121,12 @@
                     <div class="col-md-4">
                         <label class="form-label small fw-bold">CERTIFICADO</label>
                         <select id="m-cert" class="form-select">
-                            <option>SOCIEDADE</option>
-                            <option>PARTIDAS</option>
-                            <option>ICONTAZ</option>
-                            <option>G5</option>
-                            <option>ALLTUS ADM</option>
-                            <option>ALENCAR ADM</option>
+                            <option>ALIANÇA</option>
+                            <option>SETOR 9</option>
+                            <option>NEBULA-X</option>
+                            <option>ORBITAL 5</option>
+                            <option>QUANTUM ADM</option>
+                            <option>CYBERDYNE</option>
                         </select>
                     </div>
                     <div class="col-md-8"><label class="form-label small fw-bold">EMPRESA</label><input type="text" id="m-empresa" class="form-control" required></div>
@@ -163,9 +162,9 @@
             <div class="modal-body p-4">
                 <form id="procuracaoForm" class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label small fw-bold">PROTOCOLO</label>
+                        <label class="form-label small fw-bold">PROCURAÇÃO</label>
                         <select id="m-cert" class="form-select">
-                            <option>ALIANÇA ESTELAR</option>
+                            <option>ALIANÇA</option>
                             <option>SETOR 9</option>
                             <option>NEBULA-X</option>
                             <option>ORBITAL 5</option>
@@ -173,15 +172,15 @@
                             <option>CYBERDYNE</option>
                         </select>
                     </div>
-                    <div class="col-md-8"><label class="form-label small fw-bold">CORPORAÇÃO</label><input type="text" id="m-empresa" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label small fw-bold">ID PLANETÁRIO</label><input type="text" id="m-cnpj" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label small fw-bold">DATA ESTELAR</label><input type="date" id="m-validade" class="form-control" required></div>
-                    <div class="col-md-6"><label class="form-label small fw-bold">SITUAÇÃO DE VOO</label><select id="m-sit-manual" class="form-select"><option value="Auto">Piloto Automático</option><option value="Cancelada">Aterrissado</option></select></div>
-                    <div class="col-md-6"><label class="form-label small fw-bold">COMANDANTE</label><input type="text" id="m-parceiro" class="form-control"></div>
+                    <div class="col-md-8"><label class="form-label small fw-bold">EMPRESA</label><input type="text" id="m-empresa" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">CNPJ</label><input type="text" id="m-cnpj" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">DATA</label><input type="date" id="m-validade" class="form-control" required></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">SITUAÇÃO</label><select id="m-sit-manual" class="form-select"><option value="Auto">Piloto Automático</option><option value="Cancelada">Aterrissado</option></select></div>
+                    <div class="col-md-6"><label class="form-label small fw-bold">PARCEIRO</label><input type="text" id="m-parceiro" class="form-control"></div>
                 </form>
             </div>
             <div class="modal-footer bg-light">
-                <button type="button" onclick="salvar()" class="btn btn-success px-5 fw-bold">LOGAR DADOS</button>
+                <button type="button" onclick="salvar()" class="btn btn-success px-5 fw-bold">SALVAR</button>
             </div>
         </div>
     </div>
