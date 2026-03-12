@@ -190,15 +190,36 @@
 
 <script>
     let dados = [
-        { certificado: "ALIANÇA", empresa: "MINERAÇÃO E PRESTAÇÃO DE SERVIÇOS", cnpj: "00.111.222/0001-99", validade: "2029-12-20", situacao: "Ativa", parceiro: "Capitão Nemo" },
+        { certificado: "ALIANÇA", empresa: "MORE MINERAÇÃO E PRESTAÇÃO DE SERVIÇOS", cnpj: "00.111.222/0001-99", validade: "2029-12-20", situacao: "Ativa", parceiro: "Capitão Nemo" },
         { certificado: "SETOR 9", empresa: "LABORATÓRIOS BIOPUNK S.A.", cnpj: "99.888.777/0001-11", validade: "2030-01-31", situacao: "Vigente", parceiro: "Dra. Aris" },
         { certificado: "NEBULA-X", empresa: "TRANSPORTES DE CARGA ENDOOR", cnpj: "55.444.333/0001-22", validade: "2028-03-03", situacao: "Expirada", parceiro: "-" },
         { certificado: "ORBITAL 5", empresa: "AGRO-DOMOS DE TONY LTDA", cnpj: "12.345.678/0001-00", validade: "2027-05-02", situacao: "Vigente", parceiro: "Sidinei" },
         { certificado: "QUANTUM ADM", empresa: "COMPUTADORES POSITRÔNICOS", cnpj: "44.555.666/0001-44", validade: "2031-06-20", situacao: "Vigente", parceiro: "Zanelato" },
         { certificado: "CYBERDYNE", empresa: "RESTAURANTE UNIVERSO", cnpj: "42.424.242/0042-00", validade: "2026-07-05", situacao: "Cancelada", parceiro: "Ford Prefect" },
-        { certificado: "ALIANÇA", empresa: "HOTÉIS ORBITAIS", cnpj: "11.222.333/0001-88", validade: "2025-07-15", situacao: "Expirada", parceiro: "-" },
+        { certificado: "ALIANÇA", empresa: "HOTÉL ORBITAS", cnpj: "11.222.333/0001-88", validade: "2025-07-15", situacao: "Expirada", parceiro: "-" },
         { certificado: "SETOR 9", empresa: "OXIGÊNIO & CIA - LUNA", cnpj: "00.000.001/0001-01", validade: "2026-07-18", situacao: "Vigente", parceiro: "Tony Stark" },
-        { certificado: "NEBULA-X", empresa: "REPAROS DE ANDROIDS", cnpj: "88.777.666/0001-55", validade: "2027-07-18", situacao: "Vigente", parceiro: "Deckard" }
+        { certificado: "NEBULA-X", empresa: "REPAIR REPAROS DE ANDROIDS", cnpj: "88.777.666/0001-55", validade: "2027-07-18", situacao: "Vigente", parceiro: "Deckard" },
+        { certificado: "ALIANÇA", empresa: "JUMP REFINARIA DE HÉLIO-3", cnpj: "22.333.444/0001-55", validade: "2032-05-12", situacao: "Vigente", parceiro: "Comandante Shepard" },
+        { certificado: "ORBITAL 5", empresa: "ESTAÇÃO DE TRATAMENTO EUROPA", cnpj: "10.001.001/0001-90", validade: "2026-11-30", situacao: "Vigente", parceiro: "Isaac Clarke" },
+        { certificado: "QUANTUM ADM", empresa: "LOGTRAN LOGÍSTICA E TRANSPORTE ", cnpj: "77.666.555/0001-33", validade: "2035-08-15", situacao: "Vigente", parceiro: "Dra. Halsey" },
+        { certificado: "NEBULA-X", empresa: "DRONES DE VIGILÂNCIA TITÃ", cnpj: "33.222.111/0001-44", validade: "2025-12-31", situacao: "Expirada", parceiro: "-" },
+        { certificado: "CYBERDYNE", empresa: "PRÓTESES E BIÔNICOS NEOCIDADES", cnpj: "11.111.999/0001-00", validade: "2029-04-22", situacao: "Vigente", parceiro: "Motoko Kusanagi" },
+        { certificado: "SETOR 9", empresa: "VENUS TURISMO", cnpj: "44.444.444/0001-44", validade: "2026-02-10", situacao: "Cancelada", parceiro: "Zaphod Beeblebrox" },
+        { certificado: "ALIANÇA", empresa: "INDÚSTRIA DE TRAJES DE VÁCUO", cnpj: "55.555.555/0001-55", validade: "2030-09-09", situacao: "Vigente", parceiro: "Ellen Ripley" },
+        { certificado: "ORBITAL 5", empresa: "SISTEMAS DE INTELIGÊNCIA ARTIFICIAL", cnpj: "66.777.888/0001-99", validade: "2027-10-10", situacao: "Vigente", parceiro: "Arthur Clarke" },
+        { certificado: "NEBULA-X", empresa: "CARTOGRAFIA GEOESPACIAL", cnpj: "99.000.999/0001-01", validade: "2025-01-01", situacao: "Expirada", parceiro: "Cooper" },
+        { certificado: "QUANTUM ADM", empresa: "SISTEMAS DE DEFESA GALAPATOS", cnpj: "88.111.222/0001-88", validade: "2040-06-30", situacao: "Vigente", parceiro: "Mestre Yoda" },
+        { certificado: "SETOR 9", empresa: "CULTIVO DE ALGAS ENCELADO", cnpj: "12.012.012/0001-12", validade: "2028-03-25", situacao: "Vigente", parceiro: "Mark Watney" },
+        { certificado: "CYBERDYNE", empresa: "INTELIGÊNCIA SINTÉTICA HAL-9000", cnpj: "90.000.900/0001-90", validade: "2026-01-01", situacao: "Cancelada", parceiro: "-" },
+        { certificado: "ALIANÇA", empresa: "PESQUISA DE MATÉRIA ESCURA", cnpj: "01.010.101/0001-01", validade: "2031-07-07", situacao: "Vigente", parceiro: "Neil Tyson" },
+        { certificado: "ORBITAL 5", empresa: "RECICLAGEM DE LIXO ELETRÔNICO", cnpj: "32.321.321/0001-32", validade: "2027-11-11", situacao: "Vigente", parceiro: "Wall-E" },
+        { certificado: "NEBULA-X", empresa: "COMUNICAÇÃO SUBSPAÇO LTDA", cnpj: "77.777.888/0001-00", validade: "2026-08-20", situacao: "Vigente", parceiro: "Uhura" },
+        { certificado: "QUANTUM ADM", empresa: "BANCO CENTRAL DA FEDERAÇÃO", cnpj: "00.000.000/0001-00", validade: "2099-12-31", situacao: "Vigente", parceiro: "Spock" },
+        { certificado: "CYBERDYNE", empresa: "REPARAÇÃO DE AERONAVES MILLENNIUM", cnpj: "12.012.747/0001-12", validade: "2028-05-04", situacao: "Vigente", parceiro: "Han Solo" },
+        { certificado: "SETOR 9", empresa: "BIO-ENGENHARIA AGRO", cnpj: "65.432.109/0001-88", validade: "2033-02-14", situacao: "Vigente", parceiro: "Dra. Ryan Stone" },
+        { certificado: "ALIANÇA", empresa: "EXPLORAÇÃO DE CRISTAIS KYBER", cnpj: "44.333.222/0001-11", validade: "2025-10-30", situacao: "Expirada", parceiro: "-" },
+        { certificado: "ORBITAL 5", empresa: "INSTITUTO DE CRIOGENIA DEEP SLEEP", cnpj: "09.090.090/0001-09", validade: "2050-01-01", situacao: "Vigente", parceiro: "Khan" }
+        
     ];
     let editIdx = -1;
     let ordem = { col: null, dir: 'asc' };
